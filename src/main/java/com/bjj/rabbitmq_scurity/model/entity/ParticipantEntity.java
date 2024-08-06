@@ -1,4 +1,4 @@
-package com.bjj.rabbitmq_scurity.entity;
+package com.bjj.rabbitmq_scurity.model.entity;
 
 
 import jakarta.persistence.*;
@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.misc.NotNull;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Data
@@ -15,7 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Participant {
+public class ParticipantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
