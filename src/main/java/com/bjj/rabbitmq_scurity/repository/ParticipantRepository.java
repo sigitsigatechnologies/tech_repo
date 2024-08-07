@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ParticipantRepository extends JpaRepository<ParticipantEntity, Long> {
+    ParticipantEntity findByEmail(String email);
 }

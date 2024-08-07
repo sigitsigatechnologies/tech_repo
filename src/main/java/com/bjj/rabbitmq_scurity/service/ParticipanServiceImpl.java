@@ -1,13 +1,11 @@
 package com.bjj.rabbitmq_scurity.service;
 
+import com.bjj.rabbitmq_scurity.config.mapper.ParticipantMapper;
 import com.bjj.rabbitmq_scurity.exception.ResourceNotFoundException;
 import com.bjj.rabbitmq_scurity.model.dto.ParticipantDto;
 import com.bjj.rabbitmq_scurity.model.entity.ParticipantEntity;
-import com.bjj.rabbitmq_scurity.model.payload.response.ParticipantResponse;
 import com.bjj.rabbitmq_scurity.repository.ParticipantRepository;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,30 +24,39 @@ public class ParticipanServiceImpl implements ParticipantService{
     @Autowired
     ParticipantRepository participantRepository;
 
-
     @Override
-    public Page<ParticipantResponse> getAllParticipant(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public Page<ParticipantEntity> getAllParticipant(int pageNo, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<ParticipantEntity> participantEntities = participantRepository.findAll(pageable);
-        return participantEntities.map(ParticipantResponse::fromEntity);
+
+        return participantEntities;
+//       return participantEntities.map(ParticipantMapper::mapToParticipantDto);
     }
 
     @Override
-    public ParticipantEntity createParticipant(ParticipantEntity participantEntity) {
-        return participantRepository.save(participantEntity);
+    public ParticipantDto createParticipant(ParticipantDto participant) {
+
+            ParticipantEntity participantEntity = ParticipantMapper.mapToParticipant(participant);
+            if (participantRepository.findByEmail(participant.getEmail()) != null ){
+                throw new RuntimeException("Email Has exist");
+            }
+            ParticipantEntity saved = participantRepository.save(participantEntity);
+            ParticipantDto result = ParticipantMapper.mapToParticipantDto(saved);
+           return result;
     }
 
     @Override
-    public ParticipantEntity updateParticipant(long id, ParticipantEntity participantRequest) {
+    public ParticipantDto updateParticipant(long id, ParticipantDto participantDto) {
         ParticipantEntity participants = participantRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Participant", "id", id));
-        participants.setName(participantRequest.getName());
-        participants.setEmail(participantRequest.getEmail());
-        return participants;
+        participants.setName(participantDto.getName());
+        participants.setEmail(participantDto.getEmail());
+        ParticipantEntity updated = participantRepository.save(participants);
+        return ParticipantMapper.mapToParticipantDto(updated);
     }
 
     @Override

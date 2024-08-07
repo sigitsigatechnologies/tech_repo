@@ -16,8 +16,8 @@ import org.antlr.v4.runtime.misc.NotNull;
 @Builder
 public class ParticipantEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     @NotNull
