@@ -4,6 +4,7 @@ import com.bjj.rabbitmq_scurity.config.mapper.ParticipantMapper;
 import com.bjj.rabbitmq_scurity.exception.ResourceNotFoundException;
 import com.bjj.rabbitmq_scurity.model.dto.ParticipantDto;
 import com.bjj.rabbitmq_scurity.model.entity.ParticipantEntity;
+import com.bjj.rabbitmq_scurity.model.payload.response.CollectionPageableResponse;
 import com.bjj.rabbitmq_scurity.repository.ParticipantRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ParticipanServiceImpl implements ParticipantService{
@@ -25,15 +26,24 @@ public class ParticipanServiceImpl implements ParticipantService{
     ParticipantRepository participantRepository;
 
     @Override
-    public Page<ParticipantEntity> getAllParticipant(int pageNo, int pageSize, String sortBy, String sortDir) {
+    public CollectionPageableResponse getAllParticipant(int pageNo, int pageSize, String sortBy, String sortDir) {
+        List<ParticipantEntity> data = new ArrayList<ParticipantEntity>();
+
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
         // create Pageable instance
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<ParticipantEntity> participantEntities = participantRepository.findAll(pageable);
-
-        return participantEntities;
+        data = participantEntities.getContent();
+        CollectionPageableResponse result = new CollectionPageableResponse<>(
+                data,
+                participantEntities.getNumber(),
+                participantEntities.getSize(),
+                participantEntities.getTotalPages(),
+                participantEntities.getTotalElements()
+        );
+        return result;
 //       return participantEntities.map(ParticipantMapper::mapToParticipantDto);
     }
 

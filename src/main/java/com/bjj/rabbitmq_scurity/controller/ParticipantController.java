@@ -24,10 +24,10 @@ public class ParticipantController {
     ParticipantService participantService;
 
     @GetMapping(value = "/getAllParticipant")
-    ResponseEntity<Page<ParticipantEntity>> getFilteredStudent(@RequestParam(value = "page", defaultValue = "0") Integer page,
+    ResponseEntity<CollectionPageableResponse> getFilteredStudent(@RequestParam(value = "page", defaultValue = "0") Integer page,
                                                                         @RequestParam(value = "size", defaultValue = "10") Integer size,
                                                                         @RequestParam(value = "orderBy", defaultValue = "name") String orderBy,
-                                                                        @RequestParam(value = "direction", defaultValue = "ASC") String direction) {
+                                                                        @RequestParam(value = "direction", defaultValue = "") String direction) {
         return ResponseEntity.ok().body(participantService.getAllParticipant(page, size, orderBy, direction));
     }
 
